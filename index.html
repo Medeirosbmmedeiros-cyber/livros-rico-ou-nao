@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1b5e3f" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14151a" media="(prefers-color-scheme: dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Rico ou não">
+<title>Rico ou não — livros</title>
+<style>
+  :root{
+    --bg:#f6f5f2; --card:#ffffff; --ink:#1a1a1a; --ink-2:#4a4a4a; --ink-3:#777;
+    --line:#e2e0db; --green:#1b5e3f; --green-l:#eaf3ee; --red:#8c2f2f; --red-l:#faeeee;
+    --accent:#1b5e3f;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#14151a; --card:#1c1e24; --ink:#eceef2; --ink-2:#b9bdc6; --ink-3:#8b919c;
+      --line:#2c2f37; --green:#2e8b63; --green-l:#17241d; --red:#c0564f; --red-l:#241718;
+      --accent:#49b183;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#14151a; --card:#1c1e24; --ink:#eceef2; --ink-2:#b9bdc6; --ink-3:#8b919c;
+    --line:#2c2f37; --green:#2e8b63; --green-l:#17241d; --red:#c0564f; --red-l:#241718;
+    --accent:#49b183;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-size:15px; line-height:1.5; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1680px; margin:0 auto; padding:28px 16px 56px}
+  header h1{font-size:clamp(22px,3.2vw,32px); line-height:1.15; margin:0 0 8px; letter-spacing:-.02em}
+  header p{margin:0; color:var(--ink-2); font-size:14px; max-width:95ch}
+  header a{color:var(--accent)}
+  .toolbar{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin:18px 0 22px}
+  .btn{
+    border:1px solid var(--line); background:var(--card); color:var(--ink);
+    border-radius:999px; padding:7px 14px; font-size:13px; cursor:pointer;
+    display:inline-flex; align-items:center; gap:7px; font-family:inherit;
+  }
+  .btn:hover{border-color:var(--accent)}
+  .ttsnote{font-size:12.5px; color:var(--ink-3)}
+  .cols{display:grid; grid-template-columns:1.55fr 1fr; gap:22px; align-items:start}
+  @media (max-width:1100px){ .cols{grid-template-columns:1fr} }
+  section{background:var(--card); border:1px solid var(--line); border-radius:14px; overflow:hidden}
+  .shead{display:flex; align-items:baseline; gap:10px; padding:13px 16px; color:#fff}
+  .shead.g{background:var(--green)} .shead.r{background:var(--red)}
+  .shead h2{margin:0; font-size:14.5px; letter-spacing:.04em; text-transform:uppercase}
+  .shead span{font-size:12.5px; opacity:.85}
+  table{width:100%; border-collapse:collapse}
+  thead th{
+    text-align:left; font-size:11px; letter-spacing:.07em; text-transform:uppercase;
+    color:var(--ink-3); font-weight:600; padding:9px 12px; border-bottom:1px solid var(--line);
+  }
+  tbody td{padding:11px 12px; border-bottom:1px solid var(--line); vertical-align:top; font-size:13.5px}
+  tbody tr:last-child td{border-bottom:0}
+  tbody tr:nth-child(odd) td{background:var(--green-l)}
+  section.red tbody tr:nth-child(odd) td{background:var(--red-l)}
+  .book{display:flex; gap:11px; align-items:flex-start; min-width:210px}
+  .cover{
+    width:54px; min-width:54px; height:81px; border-radius:3px; overflow:hidden;
+    background:linear-gradient(145deg,#cfcbc3,#a9a49a); border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center; position:relative;
+  }
+  .cover img{width:100%; height:100%; object-fit:cover; display:block}
+  .cover .ph{font-size:16px; font-weight:700; color:#fff; opacity:.8}
+  .bt{font-weight:650; line-height:1.25}
+  .ba{font-size:11.5px; color:var(--ink-3); margin-top:3px}
+  .obs{color:var(--ink-2); font-style:italic}
+  .lnk{display:inline-block; color:var(--accent); text-decoration:none; font-size:12.5px; font-weight:650; white-space:nowrap}
+  .lnk:hover{text-decoration:underline}
+  .lsrc{display:block; color:var(--ink-3); font-size:11.5px; font-weight:400; font-style:normal; margin-top:3px; line-height:1.35}
+  .play{
+    width:38px; height:38px; border-radius:50%; border:1px solid var(--line);
+    background:var(--card); color:var(--accent); cursor:pointer; display:flex;
+    align-items:center; justify-content:center; padding:0; transition:background .15s,border-color .15s;
+  }
+  .play:hover{border-color:var(--accent)}
+  .play[aria-pressed="true"]{background:var(--accent); color:#fff; border-color:var(--accent)}
+  .play svg{width:16px; height:16px; fill:currentColor}
+  .play .pause{display:none}
+  .play[aria-pressed="true"] .pause{display:block}
+  .play[aria-pressed="true"] .tri{display:none}
+  .cplay{width:52px; text-align:center}
+  footer{margin-top:26px; color:var(--ink-3); font-size:12px; line-height:1.6}
+  footer a{color:var(--accent)}
+  @media (max-width:760px){
+    body{font-size:16px}
+    .wrap{padding:18px 12px 48px}
+    .toolbar{position:sticky; top:0; z-index:5; background:var(--bg); padding:8px 0; margin:12px 0 16px}
+    .btn{padding:10px 15px; font-size:14px}
+    .cols{gap:16px}
+    thead{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
+    tbody tr{display:block; border-bottom:1px solid var(--line); padding:14px 14px 12px}
+    tbody tr:last-child{border-bottom:0}
+    tbody tr:nth-child(odd) td{background:transparent}
+    tbody tr:nth-child(odd){background:var(--green-l)}
+    section.red tbody tr:nth-child(odd){background:var(--red-l)}
+    tbody td{display:block; border:0; padding:0; font-size:14.5px}
+    tbody td + td{margin-top:9px}
+    .cover{width:62px; min-width:62px; height:93px}
+    .bt{font-size:16px}
+    .cplay{text-align:left; width:auto}
+    .play{width:46px; height:46px}
+    .play svg{width:19px; height:19px}
+    .lnk{font-size:14px}
+  }
+  @media print{
+    body{background:#fff} .toolbar{display:none} .wrap{max-width:none; padding:0}
+    .cols{grid-template-columns:1.55fr 1fr}
+    @page{size:A4 landscape; margin:10mm}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Rico ou não — a leitura dos ricos e a dos não ricos</h1>
+    <p>Classificação dos livros conforme o vídeo <strong>“RICO OU NÃO ( LIVROS )”</strong>, do canal Brabão Podcast
+       (<a href="https://youtube.com/shorts/_mAmGDfZtOg" target="_blank" rel="noopener">YouTube Shorts</a>).
+       As observações entre aspas reproduzem o que o apresentador narra sobre cada obra. Para os livros classificados como
+       “de rico”, há link para um resumo na web e um botão que lê o resumo em voz alta.</p>
+  </header>
+
+  <div class="toolbar">
+    <button class="btn" id="themeBtn" type="button">◐ Tema</button>
+    <button class="btn" id="stopBtn" type="button">■ Parar áudio</button>
+    <button class="btn" id="printBtn" type="button">⎙ Imprimir / PDF</button>
+    <span class="ttsnote" id="ttsnote"></span>
+  </div>
+
+  <div class="cols">
+    <section class="green">
+      <div class="shead g"><h2>Livros de rico</h2><span id="cg"></span></div>
+      <table>
+        <thead><tr>
+          <th style="width:30%">Livro</th>
+          <th style="width:32%">Observações do apresentador</th>
+          <th style="width:28%">Resumo na web</th>
+          <th style="width:10%">Áudio</th>
+        </tr></thead>
+        <tbody id="tb-ricos"></tbody>
+      </table>
+    </section>
+
+    <section class="red">
+      <div class="shead r"><h2>Livros de não rico</h2><span id="cr"></span></div>
+      <table>
+        <thead><tr>
+          <th style="width:52%">Livro</th>
+          <th style="width:48%">Observações do apresentador</th>
+        </tr></thead>
+        <tbody id="tb-naoricos"></tbody>
+      </table>
+    </section>
+  </div>
+
+  <footer>
+    Fonte da classificação: transcrição automática do vídeo <a href="https://youtube.com/shorts/_mAmGDfZtOg" target="_blank" rel="noopener">youtube.com/shorts/_mAmGDfZtOg</a>.
+    A classificação é a opinião do apresentador, não um juízo de valor sobre as obras.<br>
+    Capas: <a href="https://openlibrary.org" target="_blank" rel="noopener">Open Library</a> (carregadas da internet).
+    O áudio usa a síntese de voz do próprio navegador — não há arquivo de som embutido e nada é enviado para fora do seu computador.
+  </footer>
+</div>
+
+<script>
+
+const RICOS = [
+{ t: "A riqueza das nações", a: "Adam Smith (1776)", c: 12816911,
+  obs: "“Esse sim. Muito, muito rico.”",
+  src: "Pontappé — resumo completo", url: "https://pontappe.com.br/resumo-a-riqueza-das-nacoes-completo/",
+  res: "A riqueza das nações, de Adam Smith, publicado em mil setecentos e setenta e seis, é a obra que funda a economia moderna. Smith argumenta que a riqueza de um país não está no ouro acumulado, mas na capacidade de produzir bens e serviços. O motor dessa produção é a divisão do trabalho: quando cada pessoa se especializa numa etapa, a produtividade cresce de forma extraordinária. Daí nasce a troca, e da troca nasce o mercado. Smith descreve então a chamada mão invisível: ao buscar o próprio interesse, dentro de regras justas, o indivíduo acaba promovendo o bem coletivo sem ter essa intenção. O livro defende a liberdade econômica, critica os monopólios e os privilégios concedidos pelo Estado, e delimita as funções legítimas do governo: defesa, justiça e obras públicas. É uma obra sobre produtividade, especialização, concorrência e instituições — a base de quase todo pensamento econômico posterior." },
+{ t: "A arte da prudência", a: "Baltasar Gracián (1647)", c: 9056561,
+  obs: "“É riquíssimo.”",
+  src: "InfoEscola — resenha", url: "https://www.infoescola.com/livros/a-arte-da-prudencia/",
+  res: "A arte da prudência, do jesuíta espanhol Baltasar Gracián, reúne trezentos aforismos sobre como agir com sabedoria no mundo real. Escrito no século dezessete, é um manual de discernimento prático: como medir palavras, escolher companhias, administrar a própria reputação e reconhecer a intenção por trás do gesto alheio. Gracián insiste que o talento sem prudência se perde, e que saber esperar o momento certo vale mais do que a pressa brilhante. Entre seus conselhos: não exibir tudo o que se sabe, deixar sempre algo em reserva; conhecer o ponto fraco de cada pessoa, inclusive o próprio; preferir a substância à aparência, mas nunca desprezar a aparência. O tom é seco, cortante, quase cirúrgico. Não é um livro de otimismo, e sim de lucidez: ensina a atravessar um mundo de interesses sem ingenuidade e sem cinismo." },
+{ t: "A lei do triunfo", a: "Napoleon Hill (1928)", c: 2292427,
+  obs: "“Muito, muito rico.”",
+  src: "Engrandece — resumo do livro", url: "https://engrandece.com/resumo-do-livro-a-lei-do-triunfo/",
+  res: "A lei do triunfo é a obra mais extensa de Napoleon Hill, resultado de vinte anos entrevistando industriais e inventores americanos a pedido de Andrew Carnegie. Hill organiza o material em dezesseis lições. Entre elas: ter um objetivo principal definido, com prazo e plano escrito; formar uma mente mestra, isto é, um grupo de pessoas em harmonia trabalhando pelo mesmo fim; cultivar autoconfiança, iniciativa e liderança; desenvolver o hábito de poupar; usar a imaginação para combinar ideias já existentes de modo novo; fazer mais do que aquilo pelo qual se é pago; e manter uma personalidade agradável e tolerante. A tese central é que o sucesso é um processo deliberado, não um acidente: ele começa com clareza de propósito, se sustenta na disciplina diária e depende tanto do caráter quanto da competência técnica." },
+{ t: "Pai rico, pai pobre", a: "Robert Kiyosaki (1997)", c: 8315603,
+  obs: "“É riquíssimo.”",
+  src: "Mobills — resumo do livro", url: "https://www.mobills.com.br/blog/educacao-financeira/resumo-livro-pai-rico-pai-pobre/",
+  res: "Pai rico, pai pobre contrapõe dois modelos mentais sobre dinheiro: o do pai biológico de Kiyosaki, professor com boa formação e vida financeira apertada, e o do pai de um amigo, empresário com pouca escolaridade formal e grande patrimônio. A lição central é a diferença entre ativo e passivo: ativo é tudo o que coloca dinheiro no seu bolso; passivo é tudo o que tira. O rico compra ativos; a classe média compra passivos acreditando que são ativos, começando pela própria casa. Kiyosaki critica o roteiro de estudar, conseguir um bom emprego e trabalhar por um salário, e defende a educação financeira: entender contabilidade, investimentos, mercado e legislação. Outros temas são o medo como principal obstáculo, a importância de trabalhar para aprender e não apenas para ganhar, e a diferença entre renda do trabalho e renda passiva." },
+{ t: "O homem mais rico da Babilônia", a: "George S. Clason (1926)", c: 15240021,
+  obs: "“Muito, muito rico. Simples, mas profundo e muito rico.”",
+  src: "Resumo do Livro", url: "https://resumodolivro.com.br/resumo-livro-o-homem-mais-rico-da-babilonia-george-s-clason/",
+  res: "O homem mais rico da Babilônia ensina princípios de finanças pessoais por meio de parábolas ambientadas na antiga Babilônia. O personagem Arkad, de escriba pobre a homem mais rico da cidade, transmite regras simples. A primeira: pague a si mesmo primeiro, guardando pelo menos dez por cento de tudo o que ganha, antes de qualquer despesa. A segunda: controle os gastos, distinguindo necessidade de desejo, porque despesas crescem até consumir toda a renda se não forem limitadas. A terceira: faça o ouro trabalhar para você, investindo de modo que gere renda. A quarta: proteja o capital contra perdas, buscando conselho de quem é competente no assunto e desconfiando de promessas de ganho fácil. Completam a lista: ter casa própria, garantir renda futura e aumentar a própria capacidade de ganhar. É um livro curto, direto e de aplicação imediata." },
+{ t: "Princípios de economia política", a: "John Stuart Mill (1848)", c: 862387,
+  obs: "“Muito, muito rico. Esse aí é o rico padrão, o rico inteligente, o rico visionário.”",
+  src: "Revista FAE — artigo em PDF", url: "https://revistafae.fae.edu/revistafae/article/download/7/7/13",
+  res: "Princípios de economia política, de John Stuart Mill, foi o manual de economia mais influente do século dezenove. Mill sistematiza produção, distribuição, troca e o papel do governo, e introduz uma distinção decisiva: as leis da produção dependem de fatos técnicos e naturais, mas as leis da distribuição dependem de instituições humanas e, portanto, podem ser mudadas por escolha política. Essa separação abre espaço para discutir desigualdade, propriedade, herança e cooperação entre trabalhadores sem abandonar a economia de mercado. Mill defende a liberdade individual e o livre comércio, mas admite intervenções em educação, proteção de incapazes e bens que o mercado não fornece bem. Antecipa ainda o conceito de estado estacionário, no qual o crescimento material cessa e o progresso passa a ser cultural e moral — uma ideia que hoje dialoga com os debates sobre limites ambientais." },
+{ t: "A arte da guerra", a: "Sun Tzu (séc. V a.C.)", c: 14441542,
+  obs: "“Muito, muito rico. É o rico estrategista.”",
+  src: "Cultura Genial — resumo dos 13 capítulos", url: "https://www.culturagenial.com/livro-a-arte-da-guerra/",
+  res: "A arte da guerra, atribuída ao general chinês Sun Tzu, reúne treze capítulos sobre estratégia. A tese que atravessa o livro é que a vitória máxima é vencer sem combater: a guerra custa caro, desgasta o Estado e deve ser o último recurso. Antes de agir, o comandante avalia cinco fatores — a causa moral, o clima, o terreno, a liderança e a disciplina. Sun Tzu insiste no conhecimento: conheça o inimigo e conheça a si mesmo, e em cem batalhas não correrá perigo. Defende o uso da informação e da espionagem, a rapidez sobre a campanha prolongada, o ataque onde o adversário está despreparado e a flexibilidade: assim como a água não tem forma fixa, o exército se adapta ao terreno. Por isso o livro migrou do campo militar para os negócios, a política e a negociação." },
+{ t: "A vida intelectual", a: "A.-D. Sertillanges (1921)", c: 607514,
+  obs: "“Muito, muito rico. O rico preocupado com o seu futuro, com seu desenvolvimento intelectual, com o desenvolvimento das suas virtudes.”",
+  src: "Brasil Paralelo — resumo completo", url: "https://www.brasilparalelo.com.br/noticias/resumo-completo-do-livro-a-vida-intelectual-de-a-d-sertillanges",
+  res: "A vida intelectual, do dominicano Antonin-Dalmace Sertillanges, é um manual sobre como estudar seriamente dentro de uma vida comum. A tese inicial é consoladora: não é preciso ser gênio nem ter tempo ilimitado. Duas horas diárias bem usadas, ao longo de anos, formam um homem instruído. Mas o autor exige contrapartidas: a vida intelectual é uma vocação que organiza tudo o mais — o sono, a alimentação, as amizades, o silêncio, o uso do tempo livre. Sertillanges ensina a escolher poucos livros e lê-los a fundo em vez de muitos superficialmente, a tomar notas, a ter um campo próprio de estudo cercado por conhecimentos auxiliares, e a cultivar a memória e a reflexão pessoal, que valem mais que a erudição acumulada. O estudo, para ele, é um ato moral: busca-se a verdade, não o aplauso." },
+{ t: "O poder do subconsciente", a: "Joseph Murphy (1963)", c: 13218984,
+  obs: "“Muito, muito rico.”",
+  src: "Você.top — resumo do livro", url: "https://www.voce.top/o-poder-do-subconsciente-resumo/",
+  res: "O poder do subconsciente, de Joseph Murphy, sustenta que a mente opera em dois níveis: o consciente, que raciocina e escolhe, e o subconsciente, que aceita sem crítica o que lhe é repetidamente sugerido e governa hábitos, emoções e respostas automáticas. Para Murphy, aquilo que se imprime no subconsciente tende a se manifestar na conduta e, por consequência, nos resultados da vida. O livro propõe técnicas práticas: afirmações repetidas, visualização de cenas já realizadas, oração, relaxamento antes de dormir e substituição deliberada de pensamentos de medo por imagens de solução. Murphy aplica o método a saúde, relacionamentos, trabalho e dinheiro, e insiste na coerência entre o que se afirma e o que se sente. Convém ler com espírito crítico: muitas promessas do autor não têm respaldo científico, mas o núcleo sobre hábitos mentais e autossugestão é aproveitável." },
+{ t: "A meta: um processo de melhoria contínua", a: "Eliyahu Goldratt (1984)", c: 15131489,
+  obs: "“Muito rico.”",
+  src: "Blog Lean Construction — resumo", url: "https://leanconstruction.wordpress.com/2008/09/30/resumo-do-livro-a-meta/",
+  res: "A meta, de Eliyahu Goldratt, é um romance empresarial que apresenta a Teoria das Restrições. Alex Rogo tem três meses para salvar a fábrica que dirige. Orientado pelo físico Jonah, descobre que a meta de uma empresa é ganhar dinheiro, e que isso se mede por três indicadores: ganho, inventário e despesa operacional. A grande virada é entender que otimizar cada máquina isoladamente não melhora o resultado do todo: o desempenho do sistema é ditado pelo seu gargalo. Daí os cinco passos: identificar a restrição, explorá-la ao máximo, subordinar todo o resto a ela, elevar sua capacidade e, quando ela deixar de ser restrição, recomeçar o ciclo sem deixar a inércia se instalar. O livro também mostra o efeito da combinação entre eventos dependentes e flutuações estatísticas — a famosa cena da caminhada dos escoteiros." },
+{ t: "O gestor eficaz", a: "Peter Drucker (1967)", c: 12372561,
+  obs: "“Muito, muito rico. O rico que pratica e exerce a liderança de verdade.”",
+  src: "Blog Voitto — resumo", url: "https://blog.voitto.com.br/resumo/the-effective-executive",
+  res: "O gestor eficaz, de Peter Drucker, parte de uma constatação: eficácia não é talento nato, é um conjunto de hábitos que se aprende. Drucker descreve cinco. Primeiro, saber para onde vai o próprio tempo, registrando e eliminando o que é desperdício. Segundo, concentrar-se na contribuição, perguntando que resultado se espera de mim, em vez de focar no esforço. Terceiro, construir sobre forças — as próprias, as dos colaboradores, as do chefe e as da situação — em vez de tentar corrigir fraquezas. Quarto, concentrar-se em poucas prioridades, fazendo uma coisa de cada vez e abandonando o que já não produz valor. Quinto, tomar decisões eficazes: poucas, no nível certo, baseadas em divergência estruturada e não em consenso fácil, e sempre com o plano de execução definido junto com a decisão." },
+{ t: "Empresas feitas para vencer", a: "Jim Collins (2001)", c: 7431270,
+  obs: "“Muito rico.”",
+  src: "Blog Voitto — resumo", url: "https://blog.voitto.com.br/resumo/pt/good-to-great",
+  res: "Empresas feitas para vencer apresenta cinco anos de pesquisa de Jim Collins sobre companhias que saíram de desempenho mediano para resultados excepcionais e sustentados por quinze anos. Os achados: a liderança de nível cinco, que combina humildade pessoal com vontade profissional férrea; primeiro quem, depois o quê, isto é, colocar as pessoas certas no time antes de definir a estratégia; encarar os fatos brutais sem perder a fé na vitória, o chamado paradoxo de Stockdale; o conceito do porco-espinho, a interseção entre aquilo em que se pode ser o melhor do mundo, aquilo que move o motor econômico e aquilo que apaixona; a cultura de disciplina, que dispensa controle excessivo; e o uso da tecnologia como acelerador, nunca como causa da transformação. Collins descreve o efeito volante: nenhuma virada vem de um golpe único, mas do empurrão acumulado e consistente." },
+{ t: "O príncipe", a: "Nicolau Maquiavel (1532)", c: 15142439,
+  obs: "“É riquíssimo.”",
+  src: "Brasil Paralelo — resumo", url: "https://www.brasilparalelo.com.br/artigos/resumo-o-principe-maquiavel",
+  res: "O príncipe, de Nicolau Maquiavel, rompe com a tradição de descrever governantes ideais e passa a analisar a política como ela é. Maquiavel classifica os principados e os modos de conquistá-los e mantê-los: por armas próprias, por armas alheias, por fortuna ou por virtù — a capacidade de agir com energia e inteligência diante das circunstâncias. Trata das tropas, desaconselhando mercenários e defendendo exércitos próprios, e discute as qualidades do governante: é mais seguro ser temido do que amado, embora o príncipe deva evitar o ódio, que vem sobretudo de tomar os bens e as mulheres dos súditos. A obra introduz a ideia de que fins políticos podem exigir meios que a moral comum condena, e termina com um apelo pela unificação da Itália. É o livro que inaugura a análise realista do poder." },
+{ t: "Analectos", a: "Confúcio (séc. V a.C.)", c: 9341970,
+  obs: "“Muito, mas muito, muito rico.”",
+  src: "Bookey — resumo em texto e áudio", url: "https://www.bookey.app/pt/book/os-analectos",
+  res: "Os Analectos reúnem ditos e diálogos de Confúcio registrados por seus discípulos. Não há sistema filosófico fechado, e sim fragmentos sobre como viver bem e governar bem. O centro é o ren, a humanidade ou benevolência, e o li, o conjunto de ritos e boas maneiras que dão forma concreta à virtude. Confúcio ensina a regra de ouro na forma negativa: não faças aos outros o que não queres que te façam. Valoriza o estudo constante, dizendo que aprender sem refletir é inútil e refletir sem aprender é perigoso; a piedade filial como raiz das demais virtudes; a retificação dos nomes, isto é, chamar cada coisa e cada função pelo que de fato é; e o exemplo moral do governante como forma mais eficaz de ordenar a sociedade, acima da punição." },
+{ t: "A Bíblia Sagrada", a: "diversos autores", c: 11044656,
+  obs: "“Esse aí é o maior e melhor livro de todos os tempos. Muito, muito rico, de verdade.”",
+  src: "Estudos Bíblicos Online — resumo dos 66 livros", url: "https://www.estudosbiblicosonline.com.br/2021/04/resumos-dos-livros-da-biblia.html",
+  res: "A Bíblia é uma biblioteca de sessenta e seis livros escritos ao longo de mais de mil anos, por dezenas de autores, em hebraico, aramaico e grego. O Antigo Testamento começa no Pentateuco, com a criação, a aliança com Abraão, o êxodo do Egito e a Lei; segue nos livros históricos, com a conquista, os juízes, a monarquia, o exílio e o retorno; nos poéticos e sapienciais, como Salmos, Provérbios, Jó e Eclesiastes; e nos proféticos, que denunciam a injustiça e anunciam a restauração. O Novo Testamento traz os quatro evangelhos sobre a vida, os ensinamentos, a morte e a ressurreição de Jesus; Atos, sobre a expansão da igreja; as cartas de Paulo e de outros apóstolos, com doutrina e orientação prática; e o Apocalipse. Além de texto religioso, é fundamento da literatura, do direito e da arte ocidentais." }
+];
+
+const NAO_RICOS = [
+{ t:"As 48 leis do poder", a:"Robert Greene (1998)", c:6424160, obs:"“Com certeza não.”" },
+{ t:"Mais esperto que o diabo", a:"Napoleon Hill (1938/2011)", c:8260315, obs:"“Muito popular, muito indicado no meio do marketing digital, mas não.”" },
+{ t:"Como fazer amigos e influenciar pessoas", a:"Dale Carnegie (1936)", c:13314878, obs:"“Também não.”" },
+{ t:"Segredos da mente milionária", a:"T. Harv Eker (2005)", c:13876089, obs:"“Bom, mas não.”" },
+{ t:"A coragem de ser imperfeito", a:"Brené Brown (2010)", c:7237826, obs:"“Não.”" },
+{ t:"A sutil arte de ligar o f***", a:"Mark Manson (2016)", c:8231990, obs:"“Absolutamente não.” (dito entre risadas)" },
+{ t:"O milagre da manhã", a:"Hal Elrod (2012)", c:8539416, obs:"“Não.”" },
+{ t:"Mindset", a:"Carol Dweck (2006)", c:746414, obs:"“Também não.”" },
+{ t:"O poder do agora", a:"Eckhart Tolle (1997)", c:551262, obs:"“Não.”" },
+{ t:"O segredo", a:"Rhonda Byrne (2006)", c:845815, obs:"“Também não.”" },
+{ t:"Os 7 hábitos das pessoas altamente eficazes", a:"Stephen Covey (1989)", c:10079937, obs:"“Bom, mas não.”" }
+];
+
+</script>
+<script>
+(function(){
+  var ICON_PLAY  = '<svg class="tri" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
+  var ICON_PAUSE = '<svg class="pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>';
+
+  var coverQueue = [], coverBusy = false;
+  function pumpCovers(){
+    if (coverBusy) return;
+    var job = coverQueue.shift();
+    if (!job) return;
+    coverBusy = true;
+    var next = function(){ coverBusy = false; setTimeout(pumpCovers, 110); };
+    job.img.onload  = function(){ job.img.style.display = 'block'; job.ph.style.display = 'none'; next(); };
+    job.img.onerror = function(){ job.img.remove(); next(); };
+    job.img.src = job.src;
+  }
+
+  function coverEl(book, key){
+    var d = document.createElement('div'); d.className = 'cover';
+    var ph = document.createElement('span'); ph.className = 'ph';
+    ph.textContent = (book.t || '?').trim().charAt(0).toUpperCase();
+    d.appendChild(ph);
+    if (book.c){
+      var img = document.createElement('img');
+      img.decoding = 'async'; img.alt = 'Capa de ' + book.t; img.style.display = 'none';
+      d.appendChild(img);
+      coverQueue.push({ img: img, ph: ph, src: 'https://covers.openlibrary.org/b/id/' + book.c + '-M.jpg' });
+    }
+    return d;
+  }
+
+  function bookCell(book, key){
+    var td = document.createElement('td');
+    var w = document.createElement('div'); w.className = 'book';
+    var meta = document.createElement('div');
+    var t = document.createElement('div'); t.className = 'bt'; t.textContent = book.t;
+    var a = document.createElement('div'); a.className = 'ba'; a.textContent = book.a || '';
+    meta.appendChild(t); meta.appendChild(a);
+    w.appendChild(coverEl(book, key)); w.appendChild(meta);
+    td.appendChild(w);
+    return td;
+  }
+
+  var tbR = document.getElementById('tb-ricos');
+  RICOS.forEach(function(b, i){
+    var tr = document.createElement('tr');
+    tr.appendChild(bookCell(b, 'r' + (i + 1)));
+
+    var tdO = document.createElement('td'); tdO.className = 'obs'; tdO.textContent = b.obs; tr.appendChild(tdO);
+
+    var tdL = document.createElement('td');
+    var a = document.createElement('a'); a.className = 'lnk'; a.href = b.url;
+    a.target = '_blank'; a.rel = 'noopener noreferrer';
+    a.textContent = '↗ Abrir resumo';
+    var s = document.createElement('span'); s.className = 'lsrc'; s.textContent = b.src;
+    tdL.appendChild(a); tdL.appendChild(s); tr.appendChild(tdL);
+
+    var tdP = document.createElement('td'); tdP.className = 'cplay';
+    var btn = document.createElement('button');
+    btn.className = 'play'; btn.type = 'button'; btn.dataset.i = i;
+    btn.setAttribute('aria-pressed', 'false');
+    btn.setAttribute('aria-label', 'Ouvir o resumo de ' + b.t);
+    btn.title = 'Ouvir o resumo de ' + b.t;
+    btn.innerHTML = ICON_PLAY + ICON_PAUSE;
+    tdP.appendChild(btn); tr.appendChild(tdP);
+
+    tbR.appendChild(tr);
+  });
+
+  var tbN = document.getElementById('tb-naoricos');
+  NAO_RICOS.forEach(function(b, i){
+    var tr = document.createElement('tr');
+    tr.appendChild(bookCell(b, 'n' + (i + 1)));
+    var tdO = document.createElement('td'); tdO.className = 'obs'; tdO.textContent = b.obs;
+    tr.appendChild(tdO);
+    tbN.appendChild(tr);
+  });
+
+  pumpCovers();
+
+  document.getElementById('cg').textContent = RICOS.length + ' títulos';
+  document.getElementById('cr').textContent = NAO_RICOS.length + ' títulos';
+
+  var synth = window.speechSynthesis;
+  var current = null;
+  var note = document.getElementById('ttsnote');
+
+  function pickVoice(){
+    if (!synth) return null;
+    var vs = synth.getVoices() || [];
+    return vs.filter(function(v){ return /^pt[-_]?BR/i.test(v.lang); })[0]
+        || vs.filter(function(v){ return /^pt/i.test(v.lang); })[0]
+        || null;
+  }
+
+  function updateNote(){
+    if (!synth){ note.textContent = 'Seu navegador não suporta leitura em voz alta.'; return; }
+    var v = pickVoice();
+    note.textContent = v ? ('Voz: ' + v.name + ' (' + v.lang + ')')
+                         : 'Nenhuma voz em português instalada — a leitura usará a voz padrão do sistema.';
+  }
+  updateNote();
+  if (synth){ synth.onvoiceschanged = updateNote; }
+
+  function reset(btn){ if (btn) btn.setAttribute('aria-pressed','false'); }
+
+  function stopAll(){
+    current = null;
+    queue = [];
+    if (keepAlive) clearInterval(keepAlive);
+    if (synth) synth.cancel();
+    Array.prototype.forEach.call(document.querySelectorAll('.play[aria-pressed="true"]'), reset);
+  }
+
+  function chunk(text){
+    var parts = text.match(/[^.!?]+[.!?]*\s*/g) || [text];
+    var out = [], buf = '';
+    parts.forEach(function(p){
+      if ((buf + p).length > 180 && buf){ out.push(buf.trim()); buf = p; }
+      else { buf += p; }
+    });
+    if (buf.trim()) out.push(buf.trim());
+    return out;
+  }
+
+  var queue = [], keepAlive = null;
+
+  function speakNext(btn){
+    if (!queue.length){ reset(btn); current = null; clearInterval(keepAlive); return; }
+    var u = new SpeechSynthesisUtterance(queue.shift());
+    var v = pickVoice();
+    if (v){ u.voice = v; }
+    u.lang = (v && v.lang) || 'pt-BR';
+    u.rate = 1; u.pitch = 1; u.volume = 1;
+    u.onend = function(){ if (current === btn) speakNext(btn); };
+    u.onerror = function(){ reset(btn); current = null; queue = []; clearInterval(keepAlive); };
+    synth.speak(u);
+  }
+
+  document.addEventListener('click', function(ev){
+    var btn = ev.target.closest ? ev.target.closest('.play') : null;
+    if (!btn) return;
+    if (!synth){ alert('Seu navegador não suporta leitura em voz alta.'); return; }
+
+    var playing = btn.getAttribute('aria-pressed') === 'true';
+    var wasSpeaking = synth.speaking || synth.pending;
+    stopAll();
+    if (playing) return;
+
+    var b = RICOS[+btn.dataset.i];
+    queue = chunk(b.t + ', de ' + b.a + '. ' + b.res);
+    btn.setAttribute('aria-pressed','true');
+    current = btn;
+
+    keepAlive = setInterval(function(){
+      if (synth.speaking && !synth.paused) synth.resume();
+    }, 9000);
+
+    if (wasSpeaking) setTimeout(function(){ if (current === btn) speakNext(btn); }, 160);
+    else speakNext(btn);
+  });
+
+  document.getElementById('stopBtn').addEventListener('click', stopAll);
+  document.getElementById('printBtn').addEventListener('click', function(){ stopAll(); window.print(); });
+  window.addEventListener('beforeunload', function(){ if (synth) synth.cancel(); });
+
+  var root = document.documentElement;
+  try{ var saved = localStorage.getItem('rn-theme'); if (saved) root.setAttribute('data-theme', saved); }catch(e){}
+  document.getElementById('themeBtn').addEventListener('click', function(){
+    var cur = root.getAttribute('data-theme');
+    if (!cur) cur = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    var next = cur === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try{ localStorage.setItem('rn-theme', next); }catch(e){}
+  });
+})();
+</script>
+</body>
+</html>
